@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Indigo at the top, through magenta and hot pink, down to sunset orange and warm yellow. */
+  --sunset: linear-gradient(180deg, #1b1a8c 0%, #4c1fb0 14%, #b01fb8 34%, #ff2f8e 54%, #ff6f3c 76%, #ffc83d 100%);
+  --sunset-soft: linear-gradient(180deg, rgba(27, 26, 140, 0.55) 0%, rgba(176, 31, 184, 0.45) 40%, rgba(255, 111, 60, 0.4) 100%);
+  --ink: #000;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  background: #000;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  color: #fff;
+  font-family: 'DM Sans', ui-sans-serif, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  /* White fill with a thick black outline: the poster-logo look. */
+  .logo-text {
+    font-family: 'Bowlby One', 'DM Sans', sans-serif;
+    color: #fff;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    text-transform: uppercase;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      -0.07em -0.07em 0 #000, 0 -0.07em 0 #000, 0.07em -0.07em 0 #000,
+      -0.07em 0 0 #000, 0.07em 0 0 #000,
+      -0.07em 0.07em 0 #000, 0 0.07em 0 #000, 0.07em 0.07em 0 #000,
+      0 0.14em 0 #000, 0 0.2em 0.12em rgba(0, 0, 0, 0.55);
+  }
+
+  .heading-outline {
+    font-family: 'Bowlby One', 'DM Sans', sans-serif;
+    color: #fff;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      -0.06em -0.06em 0 #000, 0 -0.06em 0 #000, 0.06em -0.06em 0 #000,
+      -0.06em 0 0 #000, 0.06em 0 0 #000,
+      -0.06em 0.06em 0 #000, 0 0.06em 0 #000, 0.06em 0.06em 0 #000,
+      0 0.1em 0 #000;
+  }
+
+  .bg-sunset {
+    background: var(--sunset);
+  }
+
+  /* Gradient border on a solid black surface. */
+  .sunset-card {
+    border: 2px solid transparent;
+    border-radius: 1.25rem;
+    background: linear-gradient(#050505, #050505) padding-box, var(--sunset) border-box;
+  }
+
+  .sunset-card-active {
+    border: 2px solid transparent;
+    background: linear-gradient(#120818, #120818) padding-box, var(--sunset) border-box;
+  }
+
+  .btn-sunset {
+    position: relative;
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 3px solid #000;
+    border-radius: 0.9rem;
+    padding: 0.7rem 1.4rem;
+    background: var(--sunset);
+    font-family: 'Bowlby One', 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #fff;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      -1.5px -1.5px 0 #000, 0 -1.5px 0 #000, 1.5px -1.5px 0 #000,
+      -1.5px 0 0 #000, 1.5px 0 0 #000,
+      -1.5px 1.5px 0 #000, 0 1.5px 0 #000, 1.5px 1.5px 0 #000;
+    box-shadow: 0 0 0 2px #fff, 0 6px 0 #000, 0 10px 30px rgba(255, 47, 142, 0.35);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    cursor: pointer;
+  }
+
+  .btn-sunset:hover:not(:disabled) {
+    filter: saturate(1.15) brightness(1.06);
+  }
+
+  .btn-sunset:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 2px #fff, 0 2px 0 #000, 0 6px 20px rgba(255, 47, 142, 0.3);
+  }
+
+  .btn-sunset:disabled {
+    cursor: not-allowed;
+    filter: grayscale(0.85) brightness(0.6);
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.8rem;
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
+    padding: 0.55rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.04);
+    transition: background 0.15s ease, border-color 0.15s ease;
+    cursor: pointer;
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.45);
+  }
+
+  .btn-ghost:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .field {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 0.8rem;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    background: #0b0b0b;
+    padding: 0.7rem 0.9rem;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .field::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  .field:focus {
+    border-color: #ff2f8e;
+    box-shadow: 0 0 0 3px rgba(255, 47, 142, 0.25);
+  }
+
+  .label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+}
+
+/* ConnectKit modal sits above the app; keep it readable on black. */
+:root {
+  --ck-font-family: 'DM Sans', sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

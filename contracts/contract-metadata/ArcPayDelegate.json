@@ -1,0 +1,449 @@
+{
+  "contractAddress": "0xa46efe86c1f4de5ea77edb6fd3975b7c9cd23929",
+  "network": "ARC-TESTNET",
+  "deployerWalletId": "3c2464b2-8369-52e2-a782-800bbeca5396",
+  "contract_code_path": "/home/user/app/contracts/ArcPayDelegate.sol",
+  "contract_compiled_code_path": "/home/user/app/contracts/out/ArcPayDelegate.sol/ArcPayDelegate.json",
+  "contract_network_and_links": {
+    "Arc Testnet": "https://explorer.testnet.arc.io/address/0xa46efe86c1f4de5ea77edb6fd3975b7c9cd23929"
+  },
+  "contract_deployments": [
+    {
+      "chain": "Arc Testnet",
+      "address": "0xa46efe86c1f4de5ea77edb6fd3975b7c9cd23929",
+      "explorerUrl": "https://explorer.testnet.arc.io/address/0xa46efe86c1f4de5ea77edb6fd3975b7c9cd23929",
+      "txHash": "0x04bbf20c64be3ac77229e24e8d13052236828a9b5b4d732c0e238b49315b32f1",
+      "deployedAt": "2026-10-30T19:06:23.389Z"
+    },
+    {
+      "chain": "Arc Testnet",
+      "address": "0x1045d93108fa26dfc195550e84b62bf606fcfb66",
+      "explorerUrl": "https://explorer.testnet.arc.io/address/0x1045d93108fa26dfc195550e84b62bf606fcfb66",
+      "txHash": "0x98f7ce3866d513750b22d6d55f7c59bcb61ee42a45b002c294024b479b6fa4d8",
+      "deployedAt": "2026-10-30T18:39:18.956Z"
+    }
+  ],
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "usdc_",
+          "type": "address",
+          "internalType": "contract IERC20"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "MAX_DELEGATION_DURATION",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "USDC",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IERC20"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "WINDOW",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getDelegation",
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "relayer",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "perPaymentLimit",
+          "type": "uint128",
+          "internalType": "uint128"
+        },
+        {
+          "name": "dailyLimit",
+          "type": "uint128",
+          "internalType": "uint128"
+        },
+        {
+          "name": "expiry",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "maxFee",
+          "type": "uint128",
+          "internalType": "uint128"
+        },
+        {
+          "name": "remainingToday",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "payFor",
+      "inputs": [
+        {
+          "name": "from",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "to",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "amount",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "fee",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "memo",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "revokeDelegation",
+      "inputs": [],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "setDelegation",
+      "inputs": [
+        {
+          "name": "relayer",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "perPaymentLimit",
+          "type": "uint128",
+          "internalType": "uint128"
+        },
+        {
+          "name": "dailyLimit",
+          "type": "uint128",
+          "internalType": "uint128"
+        },
+        {
+          "name": "expiry",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "maxFee",
+          "type": "uint128",
+          "internalType": "uint128"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "event",
+      "name": "DelegatedPayment",
+      "inputs": [
+        {
+          "name": "from",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "to",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "relayer",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "amount",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "fee",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "memo",
+          "type": "bytes32",
+          "indexed": false,
+          "internalType": "bytes32"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "DelegationRevoked",
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "relayer",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "DelegationSet",
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "relayer",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "perPaymentLimit",
+          "type": "uint128",
+          "indexed": false,
+          "internalType": "uint128"
+        },
+        {
+          "name": "dailyLimit",
+          "type": "uint128",
+          "indexed": false,
+          "internalType": "uint128"
+        },
+        {
+          "name": "expiry",
+          "type": "uint64",
+          "indexed": false,
+          "internalType": "uint64"
+        },
+        {
+          "name": "maxFee",
+          "type": "uint128",
+          "indexed": false,
+          "internalType": "uint128"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "error",
+      "name": "DailyLimitExceeded",
+      "inputs": [
+        {
+          "name": "requested",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "remaining",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "DelegationExpired",
+      "inputs": [
+        {
+          "name": "expiry",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "FeeTooHigh",
+      "inputs": [
+        {
+          "name": "fee",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "maxFee",
+          "type": "uint128",
+          "internalType": "uint128"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "InvalidExpiry",
+      "inputs": [
+        {
+          "name": "expiry",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "InvalidFee",
+      "inputs": [
+        {
+          "name": "maxFee",
+          "type": "uint128",
+          "internalType": "uint128"
+        },
+        {
+          "name": "perPaymentLimit",
+          "type": "uint128",
+          "internalType": "uint128"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "InvalidLimits",
+      "inputs": [
+        {
+          "name": "perPaymentLimit",
+          "type": "uint128",
+          "internalType": "uint128"
+        },
+        {
+          "name": "dailyLimit",
+          "type": "uint128",
+          "internalType": "uint128"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "InvalidRecipient",
+      "inputs": [
+        {
+          "name": "recipient",
+          "type": "address",
+          "internalType": "address"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "NoDelegation",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "NotAuthorized",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "PerPaymentLimitExceeded",
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "limit",
+          "type": "uint128",
+          "internalType": "uint128"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "SafeERC20FailedOperation",
+      "inputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "address"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "ZeroAddress",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "ZeroAmount",
+      "inputs": []
+    }
+  ]
+}
