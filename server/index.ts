@@ -38,7 +38,7 @@ if (env.databaseUrl) {
   console.warn('[db] TURSO_DATABASE_URL is not set. Run `bun run setup` to configure Turso. API is in setup mode.')
 }
 
-if (db && !process.env.VERCEL) {
+if (import.meta.main && db) {
   if (env.contract) {
     void startIndexer(db)
   } else {
@@ -304,7 +304,7 @@ export async function handleRequest(request: Request): Promise<Response> {
 
 declare const Bun: any
 
-if (typeof Bun !== 'undefined' && typeof Bun.serve === 'function' && !process.env.VERCEL) {
+if (import.meta.main && typeof Bun !== 'undefined' && typeof Bun.serve === 'function') {
   Bun.serve({
   port: env.port,
   hostname: '0.0.0.0',

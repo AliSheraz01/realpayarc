@@ -1,4 +1,4 @@
-import { createClient, type Client, type InValue, type Transaction } from '@libsql/client'
+import { createClient, type Client, type InValue, type Transaction } from '@libsql/client/web'
 
 /**
  * Turso (libSQL) storage layer. The admin supplies TURSO_DATABASE_URL and TURSO_AUTH_TOKEN
