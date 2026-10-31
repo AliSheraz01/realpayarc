@@ -18,7 +18,9 @@ interface RequestOptions {
 export async function api<T>(path: string, options: RequestOptions = {}): Promise<T> {
   let response: Response
   try {
-    response = await fetch(`/api${path}`, {
+    const baseUrl = ((import.meta as any).env?.VITE_BACKEND_URL || (import.meta as any).env?.NEXT_PUBLIC_BACKEND_URL || '').replace(/\/+$/, '')
+    const url = baseUrl ? `${baseUrl}/api${path}` : `/api${path}`
+    response = await fetch(url, {
       method: options.method ?? 'GET',
       headers: {
         ...(options.body ? { 'content-type': 'application/json' } : {}),

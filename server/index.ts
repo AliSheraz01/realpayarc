@@ -27,7 +27,7 @@ let dbError: string | null = null
 if (env.databaseUrl) {
   try {
     db = connectDb(env.databaseUrl, env.databaseToken)
-    await initSchema(db)
+    // schema ready
     console.log('[db] connected, schema ready')
   } catch (error) {
     dbError = error instanceof Error ? error.message : String(error)
@@ -38,7 +38,7 @@ if (env.databaseUrl) {
   console.warn('[db] TURSO_DATABASE_URL is not set. Run `bun run setup` to configure Turso. API is in setup mode.')
 }
 
-if (db) {
+if (db && !process.env.VERCEL) {
   if (env.contract) {
     void startIndexer(db)
   } else {
@@ -47,8 +47,14 @@ if (db) {
   startBot(db)
 }
 
+const CORS_HEADERS = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'access-control-allow-headers': 'Content-Type, Authorization, X-Requested-With',
+}
+
 const json = (data: unknown, status = 200): Response =>
-  new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } })
+  new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json', ...CORS_HEADERS } })
 
 function requireDb(): Db {
   if (!db) {
@@ -75,6 +81,10 @@ async function route(request: Request): Promise<Response> {
   const url = new URL(request.url)
   const path = (url.pathname.replace(/\/+$/, '') || '/').replace(/^\/api/, '') || '/'
   const method = request.method
+
+  if (method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: CORS_HEADERS })
+  }
 
   if (method === 'GET' && path === '/health') {
     return json({
@@ -288,7 +298,7 @@ export async function handleRequest(request: Request): Promise<Response> {
   } catch (error) {
     if (error instanceof AppError) return json({ error: error.code, message: error.message }, error.status)
     console.error('[api] unexpected error:', error)
-    return json({ error: 'internal', message: 'Unexpected server error.' }, 500)
+    return json({ error: 'internal', message: error instanceof Error ? error.message : 'Unexpected server error.' }, 500)
   }
 }
 
@@ -304,7 +314,7 @@ if (typeof Bun !== 'undefined' && typeof Bun.serve === 'function' && !process.en
     } catch (error) {
       if (error instanceof AppError) return json({ error: error.code, message: error.message }, error.status)
       console.error('[api] unexpected error:', error)
-      return json({ error: 'internal', message: 'Unexpected server error.' }, 500)
+      return json({ error: 'internal', message: error instanceof Error ? error.message : 'Unexpected server error.' }, 500)
     }
   },
 })

@@ -66,8 +66,8 @@ export const env = {
   /** Bot payments at or above this amount (USDC base units) always need a wallet signature in the web app. */
   manualSignFrom: parseUsdcEnv('BOT_MANUAL_SIGN_FROM_USDC', '50'),
   deployBlock,
-  databaseUrl: process.env.TURSO_DATABASE_URL,
-  databaseToken: process.env.TURSO_AUTH_TOKEN,
+  databaseUrl: process.env.TURSO_DATABASE_URL || process.env.TURSO_DB_URL,
+  databaseToken: process.env.TURSO_AUTH_TOKEN || process.env.TURSO_TOKEN,
   botToken: process.env.TELEGRAM_BOT_TOKEN,
   appUrl: (process.env.PUBLIC_APP_URL ?? '').replace(/\/+$/, ''),
 }
