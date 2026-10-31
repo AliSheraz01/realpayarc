@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "build": "vite build",
     "server": "bun run ./server/index.ts",
     "server:watch": "bun --watch ./server/index.ts",
     "setup": "bun run ./scripts/setup.ts",

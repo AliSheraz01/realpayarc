@@ -163,7 +163,7 @@ export async function startIndexer(db: Db): Promise<void> {
       indexerStatus.behind = (head >= next ? head - next + 1n : 0n).toString()
 
       if (next > head) {
-        await Bun.sleep(2500)
+        await new Promise((r) => setTimeout(r, 2500))
         continue
       }
 
@@ -174,11 +174,11 @@ export async function startIndexer(db: Db): Promise<void> {
       await setKv(db, 'indexer_next_block', next.toString())
       indexerStatus.lastError = null
       if (to < head) continue
-      await Bun.sleep(2500)
+      await new Promise((r) => setTimeout(r, 2500))
     } catch (error) {
       indexerStatus.lastError = error instanceof Error ? error.message : String(error)
       console.warn('[indexer] retrying after error:', indexerStatus.lastError)
-      await Bun.sleep(5000)
+      await new Promise((r) => setTimeout(r, 5000))
     }
   }
 }

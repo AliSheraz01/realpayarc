@@ -128,12 +128,12 @@ async function run(db: Db, api: TelegramApi): Promise<void> {
       botStatus.lastError = null
     } catch (error) {
       botStatus.lastError = error instanceof Error ? error.message : String(error)
-      await Bun.sleep(3000)
+      await new Promise((r) => setTimeout(r, 3000))
     }
   }
 }
 
-async function handleUpdate(db: Db, api: TelegramApi, update: TgUpdate): Promise<void> {
+export async function handleUpdate(db: Db, api: TelegramApi, update: TgUpdate): Promise<void> {
   if (update.message?.text && update.message.from && !update.message.from.is_bot) {
     await handleMessage(db, api, update.message)
   } else if (update.callback_query) {

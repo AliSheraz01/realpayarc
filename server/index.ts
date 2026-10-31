@@ -1,5 +1,6 @@
 import { authenticate, createNonce, verifySignIn, type AuthContext } from './auth'
-import { botStatus, startBot } from './bot'
+import { botStatus, startBot, handleUpdate } from './bot'
+import { TelegramApi } from './telegram-api'
 import { publicClient } from './chain'
 import { connectDb, initSchema, nowIso, type Db } from './db'
 import { env } from './env'
@@ -72,7 +73,7 @@ async function readBody<T>(request: Request): Promise<T> {
 
 async function route(request: Request): Promise<Response> {
   const url = new URL(request.url)
-  const path = url.pathname.replace(/\/+$/, '') || '/'
+  const path = (url.pathname.replace(/\/+$/, '') || '/').replace(/^\/api/, '') || '/'
   const method = request.method
 
   if (method === 'GET' && path === '/health') {
@@ -98,6 +99,23 @@ async function route(request: Request): Promise<Response> {
   }
 
   const database = requireDb()
+
+  if (method === 'POST' && path === '/telegram') {
+    const update = await readBody<any>(request)
+    if (env.botToken) {
+      const api = new TelegramApi(env.botToken)
+      await handleUpdate(database, api, update).catch((err) => console.error('[bot webhook] error:', err))
+    }
+    return json({ ok: true })
+  }
+
+  if (method === 'GET' && path === '/telegram/setup') {
+    if (!env.botToken) throw new AppError('bad_request', 'TELEGRAM_BOT_TOKEN not configured.')
+    const api = new TelegramApi(env.botToken)
+    const webhookUrl = `${env.appUrl || 'https://realpayarc.vercel.app'}/api/telegram`
+    const result = await api.call('setWebhook', { url: webhookUrl })
+    return json({ ok: true, webhookUrl, result })
+  }
 
   if (method === 'POST' && path === '/auth/nonce') {
     rateLimit(`nonce:${clientIp(request)}`, 20, 60_000)
@@ -264,10 +282,23 @@ async function watchSubmission(database: Db, intentId: string, txHash: `0x${stri
   }
 }
 
-Bun.serve({
+export async function handleRequest(request: Request): Promise<Response> {
+  try {
+    return await route(request)
+  } catch (error) {
+    if (error instanceof AppError) return json({ error: error.code, message: error.message }, error.status)
+    console.error('[api] unexpected error:', error)
+    return json({ error: 'internal', message: 'Unexpected server error.' }, 500)
+  }
+}
+
+declare const Bun: any
+
+if (typeof Bun !== 'undefined' && typeof Bun.serve === 'function' && !process.env.VERCEL) {
+  Bun.serve({
   port: env.port,
   hostname: '0.0.0.0',
-  async fetch(request) {
+  async fetch(request: Request) {
     try {
       return await route(request)
     } catch (error) {
@@ -278,4 +309,5 @@ Bun.serve({
   },
 })
 
-console.log(`[api] listening on :${env.port} (${env.chainName}, chain ${env.chainId})`)
+  console.log(`[api] listening on :${env.port} (${env.chainName}, chain ${env.chainId})`)
+}

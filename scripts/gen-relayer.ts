@@ -7,9 +7,10 @@
  * Fund the printed address with a little USDC for gas. It never needs to hold user funds.
  */
 import { appendFileSync, existsSync, readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 
-const envPath = new URL('../.env', import.meta.url).pathname
+const envPath = fileURLToPath(new URL('../.env', import.meta.url))
 const current = existsSync(envPath) ? readFileSync(envPath, 'utf8') : ''
 const existing = current.match(/^RELAYER_PRIVATE_KEY=(0x[0-9a-fA-F]{64})$/m)?.[1]
 

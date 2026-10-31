@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: arcpay-backend
+    env: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: VITE_CHAIN_ID
+        value: "5042"
+      - key: VITE_ARCPAY_ADDRESS
+        value: "0xc1cd3b07b3d068e2b8d4ec879253cdb2a005f1c5"
+      - key: VITE_DELEGATE_ADDRESS
+        value: "0xc12f426a08d5918f44e691db87c7db8c989f4579"
+      - key: ARCPAY_DEPLOY_BLOCK
+        value: "28865493"
+      - key: BOT_GAS_FEE_USDC
+        value: "0.01"
+      - key: BOT_MANUAL_SIGN_FROM_USDC
+        value: "50"
+      - key: TURSO_DATABASE_URL
+        sync: false
+      - key: TURSO_AUTH_TOKEN
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: RELAYER_PRIVATE_KEY
+        sync: false
+      - key: PUBLIC_APP_URL
+        sync: false

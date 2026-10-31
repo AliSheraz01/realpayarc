@@ -11,6 +11,7 @@
  * Nothing here ever prints the private key.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import {
   createPublicClient,
   createWalletClient,
@@ -58,7 +59,7 @@ if (!privateKey || !/^0x[0-9a-fA-F]{64}$/.test(privateKey)) {
   fail('set PRIVATE_KEY (0x + 64 hex characters) in your shell environment. Never paste it into a file or command line.')
 }
 
-const artifactPath = new URL(`../contracts/out/${contractName}.sol/${contractName}.json`, import.meta.url).pathname
+const artifactPath = fileURLToPath(new URL(`../contracts/out/${contractName}.sol/${contractName}.json`, import.meta.url))
 if (!existsSync(artifactPath)) fail('artifact not found. Run `bun run contracts:build` first.')
 const artifact = JSON.parse(readFileSync(artifactPath, 'utf8')) as { bytecode: { object: Hex } }
 
@@ -84,7 +85,7 @@ if (isMainnet) {
   )
   if (!args.includes('--yes-mainnet')) fail('mainnet deploys require the --yes-mainnet flag')
   const typed = prompt('Type DEPLOY TO MAINNET to continue:')
-  if (typed?.trim() !== 'DEPLOY TO MAINNET') fail('confirmation phrase did not match')
+  if (typed?.replace(/^\uFEFF/, '').trim() !== 'DEPLOY TO MAINNET') fail('confirmation phrase did not match')
 }
 
 const data = encodeDeployData({
@@ -105,7 +106,7 @@ if (onchainUsdc.toLowerCase() !== usdc.address.toLowerCase() || !isAddress(addre
   fail('deployed contract does not report the expected USDC address. Do not use it.')
 }
 
-const outDir = new URL('../contracts/deployments/', import.meta.url).pathname
+const outDir = fileURLToPath(new URL('../contracts/deployments/', import.meta.url))
 mkdirSync(outDir, { recursive: true })
 writeFileSync(
   `${outDir}${contractName === 'ArcPay' ? '' : 'delegate.'}${network}.json`,

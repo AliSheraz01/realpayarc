@@ -1,0 +1,8 @@
+{
+  "network": "mainnet",
+  "chainId": 5042,
+  "address": "0xc1cd3b07b3d068e2b8d4ec879253cdb2a005f1c5",
+  "txHash": "0x7fac6861465376007e4c655f2e6c6fa02f69b07a4dc2a24ae397cd867127d7ad",
+  "blockNumber": "28865493",
+  "deployer": "0xB8e9C9659677511Be855A8582c028F3ae6d108D4"
+}

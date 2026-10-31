@@ -7,9 +7,10 @@
  * Nothing is echoed back and no secret is printed.
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { connectDb, initSchema } from '../server/db'
 
-const ENV_PATH = new URL('../.env', import.meta.url).pathname
+const ENV_PATH = fileURLToPath(new URL('../.env', import.meta.url))
 
 function readEnvFile(): Map<string, string> {
   const map = new Map<string, string>()
