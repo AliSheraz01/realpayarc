@@ -53,7 +53,16 @@ export async function getLinkByWallet(db: Db, wallet: string): Promise<TelegramL
 
 export async function getUsername(db: Db, wallet: string): Promise<string | null> {
   const row = await db.get<{ username: string | null }>('select username from users where wallet = ?', [wallet])
-  return row?.username ?? null
+  if (row?.username) return row.username
+  const addr = normalizeAddress(wallet)
+  if (addr) {
+    try {
+      return await syncUsername(db, addr)
+    } catch (e) {
+      console.warn('[services] could not sync onchain username for', wallet, e)
+    }
+  }
+  return null
 }
 
 /** Reads the registry on-chain and mirrors the result into the database. */

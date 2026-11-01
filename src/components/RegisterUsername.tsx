@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Check, Circle } from 'lucide-react'
 import { toast } from 'sonner'
@@ -66,6 +66,24 @@ export function RegisterUsername() {
     chainId: CHAIN_ID,
     query: { enabled: valid && Boolean(ARCPAY_ADDRESS) && step === 'idle' },
   })
+
+  const onchainNameQuery = useReadContract({
+    address: ARCPAY_ADDRESS,
+    abi: arcPayAbi,
+    functionName: 'usernameOf',
+    args: address ? [address] : undefined,
+    chainId: CHAIN_ID,
+    query: { enabled: Boolean(address && ARCPAY_ADDRESS) },
+  })
+
+  useEffect(() => {
+    const existing = onchainNameQuery.data as string | undefined
+    if (existing && existing.length > 0) {
+      call<{ username: string | null }>('/me/sync-username', { method: 'POST' }).finally(() => {
+        void queryClient.invalidateQueries({ queryKey: ['me'] })
+      })
+    }
+  }, [onchainNameQuery.data])
 
   const busy = step !== 'idle'
   const targetName = pending?.name ?? name
