@@ -35,7 +35,7 @@ export function getDb(): Db | null {
       db = null
     }
   }
-  return currentDb
+  return db
 }
 
 if (env.databaseUrl) {
@@ -79,7 +79,7 @@ function requireDb(): Db {
       503,
     )
   }
-  return currentDb
+  return db
 }
 
 const clientIp = (request: Request): string => request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local'
@@ -137,9 +137,13 @@ async function route(request: Request): Promise<Response> {
   if (method === 'GET' && path === '/telegram/setup') {
     if (!env.botToken) throw new AppError('bad_request', 'TELEGRAM_BOT_TOKEN not configured.')
     const api = new TelegramApi(env.botToken)
-    const webhookUrl = `${env.appUrl || 'https://realpayarc.vercel.app'}/api/telegram`
+    const customUrl = url.searchParams.get('url')
+    const origin = url.origin
+    const webhookUrl = `${customUrl || origin || env.appUrl || 'https://realpayarc.vercel.app'}/api/telegram`
+    const me = await api.call<{ username: string }>('getMe', {}).catch(() => null)
+    if (me?.username) botStatus.username = me.username
     const result = await api.call('setWebhook', { url: webhookUrl })
-    return json({ ok: true, webhookUrl, result })
+    return json({ ok: true, bot: me?.username, webhookUrl, result })
   }
 
   if (method === 'POST' && path === '/auth/nonce') {
