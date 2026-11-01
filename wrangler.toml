@@ -1,0 +1,16 @@
+name = "realpayarc-api"
+main = "worker/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+VITE_CHAIN_ID = "5042"
+VITE_ARCPAY_ADDRESS = "0xc1cd3b07b3d068e2b8d4ec879253cdb2a005f1c5"
+VITE_DELEGATE_ADDRESS = "0xc12f426a08d5918f44e691db87c7db8c989f4579"
+ARCPAY_DEPLOY_BLOCK = "28865493"
+BOT_GAS_FEE_USDC = "0.01"
+BOT_MANUAL_SIGN_FROM_USDC = "50"
+PUBLIC_APP_URL = "https://realpayarc.vercel.app"
+
+[triggers]
+crons = ["* * * * *"]

@@ -149,6 +149,25 @@ function watchedContracts(): Address[] {
   return env.delegate ? [requireContract(), env.delegate] : [requireContract()]
 }
 
+export async function runIndexerBatch(db: Db, maxBatches = 5): Promise<void> {
+  const contracts = watchedContracts()
+  let next = await resolveStart(db)
+  const head = await publicClient.getBlockNumber()
+  indexerStatus.head = head.toString()
+
+  let batchCount = 0
+  while (next <= head && batchCount < maxBatches) {
+    const to = next + BATCH - 1n < head ? next + BATCH - 1n : head
+    const logs = await publicClient.getLogs({ address: contracts, events: indexedEvents, fromBlock: next, toBlock: to })
+    await ingest(db, logs as IndexedLog[])
+    next = to + 1n
+    await setKv(db, 'indexer_next_block', next.toString())
+    batchCount++
+  }
+  indexerStatus.nextBlock = next.toString()
+  indexerStatus.behind = (head >= next ? head - next + 1n : 0n).toString()
+}
+
 export async function startIndexer(db: Db): Promise<void> {
   const contracts = watchedContracts()
   let next = await resolveStart(db)

@@ -31,6 +31,6 @@
       ]
     }
   },
-  "include": ["src", "scripts", "server", "api"],
+  "include": ["src", "scripts", "server", "api", "worker"],
   "exclude": ["node_modules", "scripts/compass-deploy.ts", "scripts/compass-deploy-helpers.ts", "scripts/self-deploy.ts"]
 }

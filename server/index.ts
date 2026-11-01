@@ -24,6 +24,18 @@ import {
 let db: Db | null = null
 let dbError: string | null = null
 
+export function getDb(): Db | null {
+  if (db) return db
+  if (env.databaseUrl) {
+    try {
+      db = connectDb(env.databaseUrl, env.databaseToken)
+    } catch {
+      db = null
+    }
+  }
+  return db
+}
+
 if (env.databaseUrl) {
   try {
     db = connectDb(env.databaseUrl, env.databaseToken)
