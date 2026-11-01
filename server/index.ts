@@ -1,3 +1,4 @@
+import type { Address } from 'viem'
 import { authenticate, createNonce, verifySignIn, type AuthContext } from './auth'
 import { botStatus, startBot, handleUpdate } from './bot'
 import { TelegramApi } from './telegram-api'
@@ -79,7 +80,7 @@ function requireDb(): Db {
       503,
     )
   }
-  return db
+  return currentDb
 }
 
 const clientIp = (request: Request): string => request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local'

@@ -84,7 +84,9 @@ createRoot(document.getElementById('root')!).render(
         defaultChain,
         supportedChains: [arc, arcTestnet],
         embeddedWallets: {
-          createOnLogin: 'users-without-wallets',
+          ethereum: {
+            createOnLogin: 'users-without-wallets',
+          },
         },
       }}
     >
