@@ -1,7 +1,7 @@
 import { authenticate, createNonce, verifySignIn, type AuthContext } from './auth'
 import { botStatus, startBot, handleUpdate } from './bot'
 import { TelegramApi } from './telegram-api'
-import { publicClient } from './chain'
+import { publicClient, usdcBalance } from './chain'
 import { connectDb, initSchema, nowIso, type Db } from './db'
 import { env } from './env'
 import { AppError, rateLimit } from './errors'
@@ -121,6 +121,17 @@ async function route(request: Request): Promise<Response> {
       databaseReady: getDb() !== null,
       delegation: { available: isDelegationAvailable(), relayer: getRelayerAddress(), contract: env.delegate ?? null },
     })
+  }
+
+  if (method === 'GET' && path === '/balance') {
+    const wallet = (url.searchParams.get('wallet') || '') as Address
+    if (!wallet) return json({ error: 'missing wallet' }, 400)
+    try {
+      const balance = await usdcBalance(wallet)
+      return json({ ok: true, wallet, balance: balance.toString() })
+    } catch (error: any) {
+      return json({ ok: false, error: error?.message || 'RPC error' }, 500)
+    }
   }
 
   const database = requireDb()

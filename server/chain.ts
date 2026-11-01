@@ -1,4 +1,5 @@
-import { createPublicClient, erc20Abi, http, isAddress, type Address, type PublicClient } from 'viem'
+import { createPublicClient, erc20Abi, fallback, http, isAddress, type Address, type PublicClient } from 'viem'
+import { arc, arcTestnet } from 'viem/chains'
 import { arcPayAbi } from '../src/lib/arcpay-abi'
 import { env } from './env'
 
@@ -9,7 +10,26 @@ export function getPublicClient(): PublicClient {
   const rpc = env.rpcUrl
   if (!client || cachedRpcUrl !== rpc) {
     cachedRpcUrl = rpc
-    client = createPublicClient({ transport: http(rpc) })
+    const mainnetUrls = [
+      'https://rpc.drpc.mainnet.arc.io',
+      'https://rpc.quicknode.mainnet.arc.io',
+      'https://rpc.blockdaemon.mainnet.arc.io',
+      rpc,
+    ]
+    const testnetUrls = [
+      'https://rpc.testnet.arc.io',
+      'https://rpc.drpc.testnet.arc.io',
+      'https://rpc.quicknode.testnet.arc.io',
+      rpc,
+    ]
+    const candidates = env.isMainnet ? mainnetUrls : testnetUrls
+    const unique = [...new Set(candidates.filter(Boolean))]
+    const transport = fallback(unique.map((url) => http(url, { timeout: 8_000, retryCount: 2 })))
+
+    client = createPublicClient({
+      chain: env.isMainnet ? arc : arcTestnet,
+      transport,
+    })
   }
   return client
 }

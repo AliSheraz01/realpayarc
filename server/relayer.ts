@@ -1,4 +1,4 @@
-import { BaseError, ContractFunctionRevertedError, createWalletClient, erc20Abi, formatEther, http, type Address } from 'viem'
+import { BaseError, ContractFunctionRevertedError, createWalletClient, erc20Abi, fallback, formatEther, http, type Address } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { arc, arcTestnet } from 'viem/chains'
 import { arcPayDelegateAbi } from '../src/lib/arcpay-abi'
@@ -17,9 +17,24 @@ export function getRelayerAccount() {
 
 export function getRelayerWalletClient() {
   const account = getRelayerAccount()
-  return account
-    ? createWalletClient({ account, chain: env.isMainnet ? arc : arcTestnet, transport: http(env.rpcUrl) })
-    : undefined
+  if (!account) return undefined
+  const rpc = env.rpcUrl
+  const mainnetUrls = [
+    'https://rpc.drpc.mainnet.arc.io',
+    'https://rpc.quicknode.mainnet.arc.io',
+    'https://rpc.blockdaemon.mainnet.arc.io',
+    rpc,
+  ]
+  const testnetUrls = [
+    'https://rpc.testnet.arc.io',
+    'https://rpc.drpc.testnet.arc.io',
+    'https://rpc.quicknode.testnet.arc.io',
+    rpc,
+  ]
+  const candidates = env.isMainnet ? mainnetUrls : testnetUrls
+  const unique = [...new Set(candidates.filter(Boolean))]
+  const transport = fallback(unique.map((url) => http(url, { timeout: 8_000, retryCount: 2 })))
+  return createWalletClient({ account, chain: env.isMainnet ? arc : arcTestnet, transport })
 }
 
 export function getRelayerAddress(): Address | null {

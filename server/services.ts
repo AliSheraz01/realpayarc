@@ -161,7 +161,7 @@ export async function resolveRecipient(db: Db, raw: string): Promise<Recipient> 
   let onchain: Address | null
   try {
     onchain = await resolveOnchainName(name)
-  } catch {
+  } catch (err: any) {
     throw new AppError('rpc_error', 'Could not reach the Arc network to look that name up. Try again shortly.', 502)
   }
   if (onchain) return { wallet: onchain, label: `@${name}`, via: 'onchain' }
@@ -242,8 +242,8 @@ export async function createIntent(
   let balance: bigint
   try {
     balance = await usdcBalance(input.sender)
-  } catch {
-    throw new AppError('rpc_error', 'Could not read your balance from the Arc network. Try again shortly.', 502)
+  } catch (err: any) {
+    throw new AppError('rpc_error', `Could not read your balance from the Arc network: ${err?.shortMessage || err?.message || 'RPC error'}. Try again shortly.`, 502)
   }
   if (balance < input.amount) {
     throw new AppError(
