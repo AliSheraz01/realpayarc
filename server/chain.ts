@@ -1,8 +1,26 @@
-import { createPublicClient, erc20Abi, http, isAddress, type Address } from 'viem'
+import { createPublicClient, erc20Abi, http, isAddress, type Address, type PublicClient } from 'viem'
 import { arcPayAbi } from '../src/lib/arcpay-abi'
 import { env } from './env'
 
-export const publicClient = createPublicClient({ transport: http(env.rpcUrl) })
+let cachedRpcUrl: string | null = null
+let client: PublicClient | null = null
+
+export function getPublicClient(): PublicClient {
+  const rpc = env.rpcUrl
+  if (!client || cachedRpcUrl !== rpc) {
+    cachedRpcUrl = rpc
+    client = createPublicClient({ transport: http(rpc) })
+  }
+  return client
+}
+
+export const publicClient: PublicClient = new Proxy({} as PublicClient, {
+  get(target, prop, receiver) {
+    const c = getPublicClient()
+    const val = Reflect.get(c, prop, receiver)
+    return typeof val === 'function' ? val.bind(c) : val
+  },
+})
 
 export function requireContract(): Address {
   if (!env.contract) throw new Error('VITE_ARCPAY_ADDRESS is not set. Deploy ArcPay and add its address to .env.')

@@ -7,7 +7,7 @@ import { env } from './env'
 import { AppError, rateLimit } from './errors'
 import { indexerStatus, ingestTransaction, startIndexer } from './indexer'
 import { toRawUsdc } from './parse'
-import { delegationAvailable, getDelegationState, getRelayerGas, relayerAddress } from './relayer'
+import { getDelegationState, getRelayerAddress, getRelayerGas, isDelegationAvailable } from './relayer'
 import {
   cancelIntent,
   createIntent,
@@ -29,11 +29,13 @@ export function getDb(): Db | null {
   if (env.databaseUrl) {
     try {
       db = connectDb(env.databaseUrl, env.databaseToken)
-    } catch {
+      dbError = null
+    } catch (err) {
+      dbError = err instanceof Error ? err.message : String(err)
       db = null
     }
   }
-  return db
+  return currentDb
 }
 
 if (env.databaseUrl) {
@@ -69,14 +71,15 @@ const json = (data: unknown, status = 200): Response =>
   new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json', ...CORS_HEADERS } })
 
 function requireDb(): Db {
-  if (!db) {
+  const currentDb = getDb()
+  if (!currentDb) {
     throw new AppError(
       'db_not_configured',
       dbError ? `Database connection failed: ${dbError}` : 'The admin has not configured the database yet (TURSO_DATABASE_URL and TURSO_AUTH_TOKEN).',
       503,
     )
   }
-  return db
+  return currentDb
 }
 
 const clientIp = (request: Request): string => request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local'
@@ -101,7 +104,7 @@ async function route(request: Request): Promise<Response> {
   if (method === 'GET' && path === '/health') {
     return json({
       ok: true,
-      database: { configured: Boolean(env.databaseUrl), ready: db !== null, error: dbError },
+      database: { configured: Boolean(env.databaseUrl), ready: getDb() !== null, error: dbError },
       chain: { id: env.chainId, name: env.chainName, mainnet: env.isMainnet },
       contract: env.contract ?? null,
       bot: { configured: Boolean(env.botToken), running: botStatus.running, username: botStatus.username, error: botStatus.lastError },
@@ -115,8 +118,8 @@ async function route(request: Request): Promise<Response> {
       chainId: env.chainId,
       contract: env.contract ?? null,
       botUsername: botStatus.username,
-      databaseReady: db !== null,
-      delegation: { available: delegationAvailable, relayer: relayerAddress, contract: env.delegate ?? null },
+      databaseReady: getDb() !== null,
+      delegation: { available: isDelegationAvailable(), relayer: getRelayerAddress(), contract: env.delegate ?? null },
     })
   }
 
@@ -216,13 +219,13 @@ async function route(request: Request): Promise<Response> {
   }
 
   if (method === 'GET' && path === '/delegation') {
-    if (!delegationAvailable) {
-      return json({ available: false, relayer: relayerAddress, contract: env.delegate ?? null, state: null })
+    if (!isDelegationAvailable()) {
+      return json({ available: false, relayer: getRelayerAddress(), contract: env.delegate ?? null, state: null })
     }
     const state = await getDelegationState(auth.wallet)
     return json({
       available: true,
-      relayer: relayerAddress,
+      relayer: getRelayerAddress(),
       contract: env.delegate,
       botFee: env.botFee.toString(),
       manualSignFrom: env.manualSignFrom.toString(),

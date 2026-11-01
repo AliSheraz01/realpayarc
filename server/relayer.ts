@@ -11,13 +11,28 @@ import { AppError } from './errors'
  * The relayer is the app's hot wallet. It submits `payFor` for users who turned on a spending limit.
  * It can only move a user's USDC inside the limits that user set onchain, and it pays the gas.
  */
-const account = env.relayerKey ? privateKeyToAccount(env.relayerKey) : undefined
-const walletClient = account
-  ? createWalletClient({ account, chain: env.isMainnet ? arc : arcTestnet, transport: http(env.rpcUrl) })
-  : undefined
+export function getRelayerAccount() {
+  return env.relayerKey ? privateKeyToAccount(env.relayerKey) : undefined
+}
 
-export const relayerAddress: Address | null = account?.address ?? null
-export const delegationAvailable = Boolean(account && env.delegate)
+export function getRelayerWalletClient() {
+  const account = getRelayerAccount()
+  return account
+    ? createWalletClient({ account, chain: env.isMainnet ? arc : arcTestnet, transport: http(env.rpcUrl) })
+    : undefined
+}
+
+export function getRelayerAddress(): Address | null {
+  return getRelayerAccount()?.address ?? null
+}
+
+export function isDelegationAvailable(): boolean {
+  return Boolean(getRelayerAccount() && env.delegate)
+}
+
+// Proxied exports for compatibility with modules importing them as values
+export const relayerAddress: Address | null = null
+export const delegationAvailable = false
 
 /** Below this the relayer cannot reliably pay gas (native view, 18 decimals: 0.01 USDC). */
 const MIN_RELAYER_GAS = 10n ** 16n
@@ -49,12 +64,13 @@ export function feeFor(state: DelegationState): bigint {
 
 export async function getDelegationState(owner: Address): Promise<DelegationState> {
   if (!env.delegate) throw new AppError('delegation_off', 'Spending limits are not set up on this server.', 503)
+  const currentRelayer = getRelayerAddress()
   const [delegation, allowance] = await Promise.all([
     publicClient.readContract({ address: env.delegate, abi: arcPayDelegateAbi, functionName: 'getDelegation', args: [owner] }),
     publicClient.readContract({ address: env.usdc, abi: erc20Abi, functionName: 'allowance', args: [owner, env.delegate] }),
   ])
   const [relayer, perPaymentLimit, dailyLimit, expiry, maxFee, remainingToday] = delegation
-  const matches = relayerAddress !== null && relayer.toLowerCase() === relayerAddress.toLowerCase()
+  const matches = currentRelayer !== null && relayer.toLowerCase() === currentRelayer.toLowerCase()
   return {
     active: matches && Number(expiry) * 1000 > Date.now(),
     relayer,
@@ -106,6 +122,7 @@ function revertMessage(error: unknown): string {
 let gasCache: { at: number; value: { address: Address; balance: string; low: boolean } } | undefined
 
 export async function getRelayerGas(): Promise<{ address: Address; balance: string; low: boolean } | null> {
+  const account = getRelayerAccount()
   if (!account) return null
   if (gasCache && Date.now() - gasCache.at < 30_000) return gasCache.value
   const raw = await publicClient.getBalance({ address: account.address })
@@ -134,6 +151,8 @@ export function sendDelegated(
 async function submit(owner: Address, to: Address, amount: bigint, fee: bigint, memo: `0x${string}`): Promise<`0x${string}`> {
   // Last line of defence: the relayer itself refuses large amounts, even if a caller forgot to check.
   if (requiresSignature(amount)) throw new AppError('needs_signature', signatureMessage())
+  const account = getRelayerAccount()
+  const walletClient = getRelayerWalletClient()
   if (!account || !walletClient || !env.delegate) {
     throw new AppError('delegation_off', 'Spending limits are not set up on this server.', 503)
   }

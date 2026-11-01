@@ -7,7 +7,7 @@ import { setNotifier } from './notify'
 import { confirmationText } from './messages'
 import { parseCommand, toRawUsdc, type Command } from './parse'
 import {
-  delegationAvailable,
+  isDelegationAvailable,
   explainBlock,
   feeFor,
   getDelegationState,
@@ -377,9 +377,9 @@ async function presentIntent(
   // Under the signature threshold and inside the spending limit: one tap on Confirm sends it, no wallet signature.
   // At or above the threshold the payment always goes through the signed web flow below.
   let note: string | undefined
-  if (delegationAvailable && requiresSignature(amount)) {
+  if (isDelegationAvailable() && requiresSignature(amount)) {
     note = signatureMessage()
-  } else if (delegationAvailable) {
+  } else if (isDelegationAvailable()) {
     try {
       const state = await getDelegationState(link.wallet)
       const fee = feeFor(state)
