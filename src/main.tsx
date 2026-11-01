@@ -15,15 +15,20 @@ import './console-capture'
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { WagmiProvider } from 'wagmi'
+import { PrivyProvider } from '@privy-io/react-auth'
+import { WagmiProvider } from '@privy-io/wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ConnectKitProvider } from 'connectkit'
 import { Toaster } from 'sonner'
+import { arc, arcTestnet } from 'viem/chains'
 import { config } from './config'
 import App from './App'
 import './index.css'
 
 const queryClient = new QueryClient()
+
+const PRIVY_APP_ID = import.meta.env.VITE_PRIVY_APP_ID || 'insert-your-privy-app-id'
+const isMainnet = Number(import.meta.env.VITE_CHAIN_ID) === arc.id
+const defaultChain = isMainnet ? arc : arcTestnet
 
 // Studio logo SVG
 const StudioLogo = () => (
@@ -68,25 +73,28 @@ const StudioWatermark = () => (
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <WagmiProvider config={config}>
+    <PrivyProvider
+      appId={PRIVY_APP_ID}
+      config={{
+        appearance: {
+          theme: 'dark',
+          accentColor: '#ff2f8e',
+          walletList: ['metamask', 'coinbase_wallet', 'rainbow', 'phantom', 'wallet_connect'],
+        },
+        defaultChain,
+        supportedChains: [arc, arcTestnet],
+        embeddedWallets: {
+          createOnLogin: 'users-without-wallets',
+        },
+      }}
+    >
       <QueryClientProvider client={queryClient}>
-        <ConnectKitProvider
-          mode="dark"
-          customTheme={{
-            '--ck-font-family': "'DM Sans', sans-serif",
-            '--ck-primary-button-background': '#ff2f8e',
-            '--ck-primary-button-hover-background': '#ff6f3c',
-            '--ck-body-background': '#0a0a0a',
-            '--ck-body-color': '#ffffff',
-            '--ck-overlay-background': 'rgba(0,0,0,0.8)',
-          }}
-        >
+        <WagmiProvider config={config}>
           <App />
           <StudioWatermark />
           <Toaster position="top-center" />
-        </ConnectKitProvider>
+        </WagmiProvider>
       </QueryClientProvider>
-    </WagmiProvider>
+    </PrivyProvider>
   </StrictMode>,
 )
-

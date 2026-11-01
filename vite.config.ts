@@ -23,7 +23,8 @@ export default defineConfig({
       'wagmi/connectors',
       'viem',
       'viem/chains',
-      'connectkit',
+      '@privy-io/react-auth',
+      '@privy-io/wagmi',
       'framer-motion',
       'lucide-react',
       'sonner',
@@ -33,6 +34,17 @@ export default defineConfig({
       'vite-plugin-node-polyfills/shims/global',
       'vite-plugin-node-polyfills/shims/process',
     ],
+  },
+  build: {
+    chunkSizeWarningLimit: 2500,
+    rollupOptions: {
+      onwarn(warning, warn) {
+        if (warning.code === 'INVALID_ANNOTATION' || warning.message?.includes('/*#__PURE__*/')) {
+          return
+        }
+        warn(warning)
+      },
+    },
   },
   server: {
     allowedHosts: true,

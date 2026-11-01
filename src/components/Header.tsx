@@ -1,22 +1,46 @@
-import { ConnectKitButton } from 'connectkit'
+import { usePrivy } from '@privy-io/react-auth'
+import { useAccount } from 'wagmi'
 import { Wallet } from 'lucide-react'
 import { CHAIN, IS_MAINNET } from '@/lib/env'
 import { Logo } from './Brand'
 
 export function ConnectButton({ label = 'Connect Wallet', big = false }: { label?: string; big?: boolean }) {
+  const { login, logout, authenticated, ready } = usePrivy()
+  const { address, isConnected } = useAccount()
+
+  const truncated = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : null
+
+  if (!ready) {
+    return (
+      <button type="button" disabled className="btn-ghost opacity-50">
+        <Wallet className="h-4 w-4" /> Loading...
+      </button>
+    )
+  }
+
+  if (isConnected || authenticated) {
+    return (
+      <button
+        type="button"
+        onClick={() => logout()}
+        className="btn-ghost"
+        title="Click to disconnect"
+      >
+        <Wallet className="h-4 w-4" />
+        {truncated || 'Connected'}
+      </button>
+    )
+  }
+
   return (
-    <ConnectKitButton.Custom>
-      {({ isConnected, isConnecting, show, truncatedAddress }) => (
-        <button
-          type="button"
-          onClick={show}
-          className={isConnected ? 'btn-ghost' : `btn-sunset ${big ? 'w-full px-8 py-4 text-lg sm:w-auto' : ''}`}
-        >
-          <Wallet className="h-4 w-4" />
-          {isConnected ? truncatedAddress : isConnecting ? 'Connecting...' : label}
-        </button>
-      )}
-    </ConnectKitButton.Custom>
+    <button
+      type="button"
+      onClick={() => login()}
+      className={big ? 'btn-sunset w-full px-8 py-4 text-lg sm:w-auto' : 'btn-sunset'}
+    >
+      <Wallet className="h-4 w-4" />
+      {label}
+    </button>
   )
 }
 
