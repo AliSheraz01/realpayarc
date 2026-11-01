@@ -14,6 +14,7 @@
     "test:server": "bun test ./server",
     "deploy:testnet": "bun run ./scripts/deploy-arcpay.ts --network testnet",
     "deploy:mainnet": "bun run ./scripts/deploy-arcpay.ts --network mainnet",
+    "deploy:worker": "wrangler deploy",
     "deploy:self": "bun run ./scripts/self-deploy.ts",
     "compass:deploy": "bun run ./scripts/compass-deploy.ts",
     "fetch:abi": "bun run ./scripts/fetch-abi.ts",
